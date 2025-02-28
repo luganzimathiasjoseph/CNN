@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="favicon.ico">
+    <title>Tire Defect Detection</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        form {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        input[type="file"] {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 100%;
+        }
+
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #555;
+        }
+
+        #loading {
+            display: none;
+            font-size: 16px;
+            color: #007bff;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Upload Tire Image for Defect Detection</h2>
+    
+    <form id="uploadForm" enctype="multipart/form-data" onsubmit="return false;">
+        <input type="file" id="fileInput" name="file" accept="image/*" required>
+        <button type="button" onclick="uploadImage()">Predict</button>
+    </form>
+    
+    <p id="loading" style="display:none;">Processing...</p>
+    <p id="result"></p>
+
+    <script>
+        function uploadImage() {
+            let formData = new FormData();
+            let fileInput = document.getElementById("fileInput");
+            let resultText = document.getElementById("result");
+            let loadingText = document.getElementById("loading");
+    
+            if (fileInput.files.length === 0) {
+                alert("Please select an image first.");
+                return;
+            }
+    
+            formData.append("file", fileInput.files[0]);
+            resultText.innerText = "";  // Clear any previous result
+            loadingText.style.display = "block";  // Show loading text
+    
+            fetch("https://resnet-g6qa.onrender.com/predict", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Server Error: ${response.status}`);
+                }
+                return response.json(); // Expect JSON response from the server
+            })
+            .then(data => {
+                loadingText.style.display = "none";  // Hide loading text
+                
+                if (data.error) {
+                    resultText.innerText = `Error: ${data.error}`; // Show error message
+                } else {
+                    resultText.innerText = `Prediction: ${data.result}`; // Show prediction result
+                }
+            })
+            .catch(error => {
+                loadingText.style.display = "none";  // Hide loading text
+                resultText.innerText = "Error: Unable to process the request.";
+                console.error("Error:", error);
+            });
+        }
+
+        // Optional: You could add logic for a GET request if needed
+        // For now, we assume the page simply renders the form when accessed.
+    </script>
+
+</body>
+
+</html>
