@@ -13,6 +13,7 @@ Flask==3.1.0
 flask-cors==5.0.1
 fonttools==4.56.0
 fsspec==2025.2.0
+gevent
 gunicorn==23.0.0
 h11==0.14.0
 idna==3.10
