@@ -12,6 +12,7 @@ filelock==3.17.0
 Flask==3.1.0
 flask-cors==5.0.1
 fonttools==4.56.0
+opencv-python-headless
 fsspec==2025.2.0
 gevent
 gunicorn==23.0.0
