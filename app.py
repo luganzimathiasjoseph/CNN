@@ -66,7 +66,7 @@ def favicon():
 def predict():
     if request.method == 'GET':
         # Handle the GET request (for displaying the form or info)
-        return render_template('predict_form.html')
+        return render_template('index.html')
 
     if request.method == 'POST':
         file = request.files.get('file')  # Use get() to avoid KeyError
