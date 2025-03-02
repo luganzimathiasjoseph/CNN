@@ -19,31 +19,23 @@ CORS(app, resources={r"/": {"origins": "*"}})  # Allow all origins
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 
-def load_pytorch_model():
-    # Define the ResNet18 model
-    model = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1)
-    model.fc = nn.Linear(model.fc.in_features, 2)  # 2 classes: Defective & Good
+# Load a pre-trained ResNet18 model and modify the classifier
+model = models.resnet18(pretrained=True)
+num_ftrs = model.fc.in_features
+model.fc = nn.Linear(num_ftrs, 2)  # Binary classification: Good vs. Defective
+model = model.to(device)
+model.eval()
 
-    # Move model to device
-    model = model.to(device)
+# Get the directory of the current script
+script_dir = os.path.dirname(os.path.abspath(__file__))
+model_path = os.path.join(script_dir, 'tire_defect_model.pth')
 
-    # Get the directory of the current script
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    model_path = os.path.join(script_dir, 'tire_defect_model.pth')
-
-    print(f"Looking for model at: {model_path}")
-
-    if not os.path.exists(model_path):
-        raise FileNotFoundError(f"The model file at {model_path} was not found")
-
-    # Load model weights
+# Load the trained model weights
+try:
     model.load_state_dict(torch.load(model_path, map_location=device))
-    model.eval()
-
-    return model
-
-# Load the model once at startup
-model = load_pytorch_model()
+    print("Model loaded successfully.")
+except Exception as e:
+    print(f"Error loading model: {e}")
 
 # Define the image transformations
 transform = transforms.Compose([
@@ -61,11 +53,9 @@ def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'),
                                'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
-# Update this route to handle both GET and POST
 @app.route('/predict', methods=['GET', 'POST'])
 def predict():
     if request.method == 'GET':
-        # Handle the GET request (for displaying the form or info)
         return render_template('index.html')
 
     if request.method == 'POST':
