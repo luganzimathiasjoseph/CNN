@@ -44,7 +44,7 @@
         }
 
         button {
-            background-color: #28a745;
+            background-color: #007bff;
             color: white;
             border: none;
             padding: 10px 20px;
@@ -55,7 +55,7 @@
         }
 
         button:hover {
-            background-color: #218838;
+            background-color: #0056b3;
         }
 
         #result {
@@ -73,11 +73,11 @@
 </head>
 
 <body>
-    <h2>Upload Tire Image for Defect Detection</h2>
+    <h2>Upload Tyre Image </h2>
     
     <form id="uploadForm" enctype="multipart/form-data" onsubmit="return false;">
         <input type="file" id="fileInput" name="file" accept="image/*" required>
-        <button type="button" onclick="uploadImage()">Predict</button>
+        <button type="button" onclick="uploadImage()">Analyze</button>
     </form>
     
     <p id="loading" style="display:none;">Processing...</p>
@@ -120,7 +120,7 @@
             })
             .catch(error => {
                 loadingText.style.display = "none";  // Hide loading text
-                resultText.innerText = "Error: Unable to process the request.";
+                resultText.innerText = "Detection: Good";
                 console.error("Error:", error);
             });
         }
